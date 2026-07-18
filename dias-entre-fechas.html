@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calculadora de días entre dos fechas — Días Exactos</title>
+<meta name="description" content="Calcula cuántos días, semanas, meses o años hay entre dos fechas. Gratis, sin registro, resultado al instante.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #E9EAE3;
+    --ink: #16221F;
+    --ink-soft: #4A544F;
+    --accent: #1B6F5A;
+    --accent-soft: #DCE7E1;
+    --mustard: #D6A419;
+    --line: #B9BDB2;
+    --paper: #FBFAF6;
+    --white: #FFFFFF;
+  }
+
+  *{ box-sizing: border-box; }
+
+  body{
+    margin:0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Inter', sans-serif;
+    line-height: 1.5;
+  }
+
+  .wrap{
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  /* HEADER */
+  header{
+    border-bottom: 1px solid var(--line);
+    padding: 28px 0;
+  }
+  header .wrap{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+  }
+  .logo{
+    font-family:'JetBrains Mono', monospace;
+    font-weight: 800;
+    font-size: 1.15rem;
+    letter-spacing: -0.02em;
+    display:flex;
+    align-items:center;
+    gap:8px;
+    text-decoration:none;
+    color: var(--ink);
+  }
+  .logo .dot{ color: var(--accent); }
+  nav a{
+    color: var(--ink-soft);
+    text-decoration:none;
+    font-size: 0.9rem;
+    margin-left: 20px;
+  }
+  nav a:hover{ color: var(--accent); }
+
+  .breadcrumb{
+    font-family:'JetBrains Mono', monospace;
+    font-size: 0.78rem;
+    color: var(--ink-soft);
+    padding: 20px 0 0;
+  }
+  .breadcrumb a{ color: var(--accent); text-decoration:none; }
+
+  /* HERO */
+  .hero{
+    padding: 24px 0 40px;
+    border-bottom: 1px dashed var(--line);
+  }
+  .eyebrow{
+    font-family:'JetBrains Mono', monospace;
+    font-size: 0.78rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 14px;
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  .eyebrow::before{
+    content:'';
+    width: 18px;
+    height: 1px;
+    background: var(--accent);
+    display:inline-block;
+  }
+  h1{
+    font-family:'JetBrains Mono', monospace;
+    font-weight: 800;
+    font-size: clamp(1.8rem, 5vw, 2.7rem);
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    margin: 0 0 18px;
+  }
+  .hero p{
+    max-width: 55ch;
+    color: var(--ink-soft);
+    font-size: 1.05rem;
+  }
+
+  /* TOOL SECTION */
+  .tool{
+    padding: 48px 0;
+  }
+
+  .calc-box{
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 28px;
+    display:flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    align-items:flex-end;
+  }
+  .field{
+    display:flex;
+    flex-direction:column;
+    gap: 6px;
+  }
+  .field label{
+    font-family:'JetBrains Mono', monospace;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--ink-soft);
+  }
+  .field input{
+    font-family:'JetBrains Mono', monospace;
+    font-size: 1rem;
+    padding: 10px 12px;
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    background: var(--white);
+    color: var(--ink);
+    min-width: 180px;
+  }
+  .field input:focus{
+    outline: 2px solid var(--accent);
+    outline-offset: 1px;
+  }
+  button.calc-btn{
+    font-family:'JetBrains Mono', monospace;
+    font-weight: 700;
+    font-size: 0.9rem;
+    background: var(--accent);
+    color: var(--white);
+    border: none;
+    padding: 12px 22px;
+    border-radius: 3px;
+    cursor: pointer;
+    letter-spacing: 0.02em;
+  }
+  button.calc-btn:hover{ background: #155A49; }
+  button.calc-btn:focus-visible{
+    outline: 2px solid var(--ink);
+    outline-offset: 2px;
+  }
+
+  /* RECEIPT / SIGNATURE ELEMENT */
+  .receipt{
+    margin-top: 28px;
+    max-width: 340px;
+    background: var(--white);
+    border: 1px solid var(--line);
+    position: relative;
+    padding: 24px 22px 22px;
+    font-family:'JetBrains Mono', monospace;
+    display:none;
+  }
+  .receipt.show{ display:block; animation: rise 0.35s ease; }
+  @keyframes rise{
+    from{ opacity:0; transform: translateY(8px); }
+    to{ opacity:1; transform: translateY(0); }
+  }
+  .receipt::before,
+  .receipt::after{
+    content:'';
+    position:absolute;
+    left:0; right:0;
+    height: 10px;
+    background:
+      radial-gradient(circle at 6px 50%, transparent 5px, var(--white) 5.5px) repeat-x;
+    background-size: 12px 10px;
+  }
+  .receipt::before{ top: -5px; }
+  .receipt::after{ bottom: -5px; transform: rotate(180deg); }
+  .receipt .r-title{
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--ink-soft);
+    border-bottom: 1px dashed var(--line);
+    padding-bottom: 10px;
+    margin-bottom: 12px;
+  }
+  .receipt .r-row{
+    display:flex;
+    justify-content: space-between;
+    font-size: 0.85rem;
+    padding: 5px 0;
+    color: var(--ink-soft);
+  }
+  .receipt .r-row span:last-child{
+    color: var(--ink);
+    font-weight: 700;
+  }
+  .receipt .r-main{
+    text-align:center;
+    margin: 14px 0;
+    padding: 14px 0;
+    border-top: 1px dashed var(--line);
+    border-bottom: 1px dashed var(--line);
+  }
+  .receipt .r-main .num{
+    font-size: 2.1rem;
+    font-weight: 800;
+    color: var(--accent);
+    line-height:1;
+  }
+  .receipt .r-main .lbl{
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--ink-soft);
+    margin-top: 6px;
+  }
+
+  .error-msg{
+    font-family:'JetBrains Mono', monospace;
+    font-size: 0.85rem;
+    color: #B0402C;
+    margin-top: 10px;
+    display:none;
+  }
+  .error-msg.show{ display:block; }
+
+  /* INFO / FAQ */
+  .info{
+    padding: 20px 0 60px;
+    border-top: 1px dashed var(--line);
+  }
+  .info h2{
+    font-family:'JetBrains Mono', monospace;
+    font-size: 1.1rem;
+    margin: 32px 0 10px;
+  }
+  .info h2:first-child{ margin-top: 32px; }
+  .info p{
+    color: var(--ink-soft);
+    max-width: 65ch;
+    font-size: 0.95rem;
+  }
+
+  .back-link{
+    display:inline-block;
+    margin-top: 28px;
+    font-family:'JetBrains Mono', monospace;
+    font-size: 0.85rem;
+    color: var(--accent);
+    text-decoration:none;
+  }
+  .back-link:hover{ text-decoration: underline; }
+
+  footer{
+    border-top: 1px solid var(--line);
+    padding: 24px 0 40px;
+    font-family:'JetBrains Mono', monospace;
+    font-size: 0.78rem;
+    color: var(--ink-soft);
+    display:flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  @media (max-width: 520px){
+    .calc-box{ flex-direction: column; align-items: stretch; }
+    button.calc-btn{ width: 100%; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <a href="index.html" class="logo">Días Exactos<span class="dot">.</span></a>
+    <nav>
+      <a href="index.html">Inicio</a>
+      <a href="index.html#proximas">Más calculadoras</a>
+    </nav>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="breadcrumb"><a href="index.html">Inicio</a> / Días entre dos fechas</div>
+</div>
+
+<section class="hero">
+  <div class="wrap">
+    <div class="eyebrow">Calculadora 02</div>
+    <h1>¿Cuántos días hay entre dos fechas?</h1>
+    <p>Introduce una fecha de inicio y una de fin. Te decimos exactamente cuántos días, semanas, meses y años completos hay entre las dos.</p>
+  </div>
+</section>
+
+<section class="tool">
+  <div class="wrap">
+    <div class="calc-box">
+      <div class="field">
+        <label for="startDate">Fecha de inicio</label>
+        <input type="date" id="startDate">
+      </div>
+      <div class="field">
+        <label for="endDate">Fecha de fin</label>
+        <input type="date" id="endDate">
+      </div>
+      <button class="calc-btn" onclick="calcularDiferencia()">Calcular diferencia</button>
+    </div>
+
+    <div class="error-msg" id="errorMsg">Introduce dos fechas válidas. La fecha de fin debe ser posterior (o igual) a la de inicio.</div>
+
+    <div class="receipt" id="receipt">
+      <div class="r-title">Días Exactos · Resultado</div>
+      <div class="r-main">
+        <div class="num" id="diasPrincipal">—</div>
+        <div class="lbl">días de diferencia</div>
+      </div>
+      <div class="r-row"><span>En semanas</span><span id="semanas">—</span></div>
+      <div class="r-row"><span>En meses aprox.</span><span id="meses">—</span></div>
+      <div class="r-row"><span>En años aprox.</span><span id="anios">—</span></div>
+      <div class="r-row"><span>Días laborables (L-V)</span><span id="laborables">—</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="info">
+  <div class="wrap">
+    <h2>¿Cómo se calcula?</h2>
+    <p>Contamos el número exacto de días naturales entre las dos fechas indicadas, incluyendo el día de fin. A partir de ahí, calculamos la equivalencia en semanas, meses y años de forma aproximada, y también los días laborables (de lunes a viernes, sin tener en cuenta festivos locales).</p>
+    <h2>¿Para qué sirve esto?</h2>
+    <p>Es útil para calcular la duración de un contrato, cuánto tiempo llevas en un trabajo o relación, cuántos días de vacaciones has tenido, o simplemente para resolver la típica duda de cuántos días han pasado (o van a pasar) entre dos fechas concretas.</p>
+    <a href="index.html" class="back-link">← Volver a todas las calculadoras</a>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap" style="display:flex; justify-content:space-between; width:100%; flex-wrap:wrap; gap:10px;">
+    <span>Días Exactos — hecho para ser útil, gratis, siempre.</span>
+    <span id="year"></span>
+  </div>
+</footer>
+
+<script>
+  document.getElementById('year').textContent = new Date().getFullYear();
+
+  function calcularDiferencia(){
+    const startVal = document.getElementById('startDate').value;
+    const endVal = document.getElementById('endDate').value;
+    const errorMsg = document.getElementById('errorMsg');
+    const receipt = document.getElementById('receipt');
+
+    if(!startVal || !endVal){
+      errorMsg.classList.add('show');
+      receipt.classList.remove('show');
+      return;
+    }
+
+    const start = new Date(startVal + 'T00:00:00');
+    const end = new Date(endVal + 'T00:00:00');
+
+    if(isNaN(start.getTime()) || isNaN(end.getTime()) || end < start){
+      errorMsg.classList.add('show');
+      receipt.classList.remove('show');
+      return;
+    }
+    errorMsg.classList.remove('show');
+
+    const msPerDay = 1000 * 60 * 60 * 24;
+    const totalDays = Math.round((end - start) / msPerDay) + 1; // inclusive
+    const weeks = (totalDays / 7).toFixed(1);
+    const months = (totalDays / 30.44).toFixed(1);
+    const years = (totalDays / 365.25).toFixed(2);
+
+    // Días laborables (lunes a viernes)
+    let businessDays = 0;
+    let cur = new Date(start);
+    while(cur <= end){
+      const day = cur.getDay();
+      if(day !== 0 && day !== 6) businessDays++;
+      cur.setDate(cur.getDate() + 1);
+    }
+
+    document.getElementById('diasPrincipal').textContent = totalDays.toLocaleString('es-ES');
+    document.getElementById('semanas').textContent = weeks;
+    document.getElementById('meses').textContent = months;
+    document.getElementById('anios').textContent = years;
+    document.getElementById('laborables').textContent = businessDays.toLocaleString('es-ES');
+
+    receipt.classList.add('show');
+  }
+</script>
+
+</body>
+</html>
