@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cuenta atrás para un evento — Días Exactos</title>
+<meta name="description" content="Calcula cuántos días, horas y minutos faltan para tu boda, un viaje, un cumpleaños o cualquier fecha importante. Gratis y al instante.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #E9EAE3;
+    --ink: #16221F;
+    --ink-soft: #4A544F;
+    --accent: #1B6F5A;
+    --accent-soft: #DCE7E1;
+    --mustard: #D6A419;
+    --line: #B9BDB2;
+    --paper: #FBFAF6;
+    --white: #FFFFFF;
+  }
+
+  *{ box-sizing: border-box; }
+
+  body{
+    margin:0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Inter', sans-serif;
+    line-height: 1.5;
+  }
+
+  .wrap{
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  header{
+    border-bottom: 1px solid var(--line);
+    padding: 28px 0;
+  }
+  header .wrap{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+  }
+  .logo{
+    font-family:'JetBrains Mono', monospace;
+    font-weight: 800;
+    font-size: 1.15rem;
+    letter-spacing: -0.02em;
+    display:flex;
+    align-items:center;
+    gap:8px;
+    text-decoration:none;
+    color: var(--ink);
+  }
+  .logo .dot{ color: var(--accent); }
+  nav a{
+    color: var(--ink-soft);
+    text-decoration:none;
+    font-size: 0.9rem;
+    margin-left: 20px;
+  }
+  nav a:hover{ color: var(--accent); }
+
+  .breadcrumb{
+    font-family:'JetBrains Mono', monospace;
+    font-size: 0.78rem;
+    color: var(--ink-soft);
+    padding: 20px 0 0;
+  }
+  .breadcrumb a{ color: var(--accent); text-decoration:none; }
+
+  .hero{
+    padding: 24px 0 40px;
+    border-bottom: 1px dashed var(--line);
+  }
+  .eyebrow{
+    font-family:'JetBrains Mono', monospace;
+    font-size: 0.78rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 14px;
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  .eyebrow::before{
+    content:'';
+    width: 18px;
+    height: 1px;
+    background: var(--accent);
+    display:inline-block;
+  }
+  h1{
+    font-family:'JetBrains Mono', monospace;
+    font-weight: 800;
+    font-size: clamp(1.8rem, 5vw, 2.7rem);
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    margin: 0 0 18px;
+  }
+  .hero p{
+    max-width: 55ch;
+    color: var(--ink-soft);
+    font-size: 1.05rem;
+  }
+
+  .tool{
+    padding: 48px 0;
+  }
+
+  .calc-box{
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 28px;
+    display:flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    align-items:flex-end;
+  }
+  .field{
+    display:flex;
+    flex-direction:column;
+    gap: 6px;
+    flex: 1;
+    min-width: 180px;
+  }
+  .field label{
+    font-family:'JetBrains Mono', monospace;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--ink-soft);
+  }
+  .field input{
+    font-family:'JetBrains Mono', monospace;
+    font-size: 1rem;
+    padding: 10px 12px;
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    background: var(--white);
+    color: var(--ink);
+    width: 100%;
+  }
+  .field input:focus{
+    outline: 2px solid var(--accent);
+    outline-offset: 1px;
+  }
+  button.calc-btn{
+    font-family:'JetBrains Mono', monospace;
+    font-weight: 700;
+    font-size: 0.9rem;
+    background: var(--accent);
+    color: var(--white);
+    border: none;
+    padding: 12px 22px;
+    border-radius: 3px;
+    cursor: pointer;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+  }
+  button.calc-btn:hover{ background: #155A49; }
+  button.calc-btn:focus-visible{
+    outline: 2px solid var(--ink);
+    outline-offset: 2px;
+  }
+
+  .receipt{
+    margin-top: 28px;
+    max-width: 420px;
+    background: var(--white);
+    border: 1px solid var(--line);
+    position: relative;
+    padding: 24px 22px 22px;
+    font-family:'JetBrains Mono', monospace;
+    display:none;
+  }
+  .receipt.show{ display:block; animation: rise 0.35s ease; }
+  @keyframes rise{
+    from{ opacity:0; transform: translateY(8px); }
+    to{ opacity:1; transform: translateY(0); }
+  }
+  .receipt::before,
+  .receipt::after{
+    content:'';
+    position:absolute;
+    left:0; right:0;
+    height: 10px;
+    background:
+      radial-gradient(circle at 6px 50%, transparent 5px, var(--white) 5.5px) repeat-x;
+    background-size: 12px 10px;
+  }
+  .receipt::before{ top: -5px; }
+  .receipt::after{ bottom: -5px; transform: rotate(180deg); }
+  .receipt .r-title{
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--ink-soft);
+    border-bottom: 1px dashed var(--line);
+    padding-bottom: 10px;
+    margin-bottom: 12px;
+  }
+  .receipt .r-event{
+    font-size: 0.95rem;
+    font-weight: 700;
+    text-align:center;
+    margin-bottom: 4px;
+  }
+  .receipt .r-grid{
+    display:grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin: 16px 0;
+    padding: 14px 0;
+    border-top: 1px dashed var(--line);
+    border-bottom: 1px dashed var(--line);
+  }
+  .receipt .r-cell{
+    text-align:center;
+  }
+  .receipt .r-cell .num{
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--accent);
+    line-height:1;
+  }
+  .receipt .r-cell .lbl{
+    font-size: 0.62rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--ink-soft);
+    margin-top: 4px;
+  }
+  .receipt .r-note{
+    text-align:center;
+    font-size: 0.78rem;
+    color: var(--ink-soft);
+  }
+  .receipt .r-note b{ color: var(--mustard); }
+
+  .error-msg{
+    font-family:'JetBrains Mono', monospace;
+    font-size: 0.85rem;
+    color: #B0402C;
+    margin-top: 10px;
+    display:none;
+  }
+  .error-msg.show{ display:block; }
+
+  .info{
+    padding: 20px 0 60px;
+    border-top: 1px dashed var(--line);
+  }
+  .info h2{
+    font-family:'JetBrains Mono', monospace;
+    font-size: 1.1rem;
+    margin: 32px 0 10px;
+  }
+  .info h2:first-child{ margin-top: 32px; }
+  .info p{
+    color: var(--ink-soft);
+    max-width: 65ch;
+    font-size: 0.95rem;
+  }
+
+  .back-link{
+    display:inline-block;
+    margin-top: 28px;
+    font-family:'JetBrains Mono', monospace;
+    font-size: 0.85rem;
+    color: var(--accent);
+    text-decoration:none;
+  }
+  .back-link:hover{ text-decoration: underline; }
+
+  footer{
+    border-top: 1px solid var(--line);
+    padding: 24px 0 40px;
+    font-family:'JetBrains Mono', monospace;
+    font-size: 0.78rem;
+    color: var(--ink-soft);
+    display:flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  @media (max-width: 520px){
+    .calc-box{ flex-direction: column; align-items: stretch; }
+    button.calc-btn{ width: 100%; }
+    .receipt .r-grid{ grid-template-columns: repeat(2, 1fr); }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <a href="index.html" class="logo">Días Exactos<span class="dot">.</span></a>
+    <nav>
+      <a href="index.html">Inicio</a>
+      <a href="index.html#proximas">Más calculadoras</a>
+    </nav>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="breadcrumb"><a href="index.html">Inicio</a> / Cuenta atrás para un evento</div>
+</div>
+
+<section class="hero">
+  <div class="wrap">
+    <div class="eyebrow">Calculadora 03</div>
+    <h1>¿Cuánto falta para tu evento?</h1>
+    <p>Ponle nombre a lo que estás esperando —una boda, un viaje, un examen, un cumpleaños— y elige la fecha. Te decimos exactamente cuánto queda.</p>
+  </div>
+</section>
+
+<section class="tool">
+  <div class="wrap">
+    <div class="calc-box">
+      <div class="field">
+        <label for="eventName">Nombre del evento (opcional)</label>
+        <input type="text" id="eventName" placeholder="Ej: Mi boda">
+      </div>
+      <div class="field">
+        <label for="eventDate">Fecha del evento</label>
+        <input type="date" id="eventDate">
+      </div>
+      <button class="calc-btn" onclick="calcularCuentaAtras()">Calcular cuenta atrás</button>
+    </div>
+
+    <div class="error-msg" id="errorMsg">Elige una fecha válida para tu evento.</div>
+
+    <div class="receipt" id="receipt">
+      <div class="r-title">Días Exactos · Cuenta atrás</div>
+      <div class="r-event" id="rEvent">Tu evento</div>
+      <div class="r-grid">
+        <div class="r-cell"><div class="num" id="rDias">—</div><div class="lbl">Días</div></div>
+        <div class="r-cell"><div class="num" id="rSemanas">—</div><div class="lbl">Semanas</div></div>
+        <div class="r-cell"><div class="num" id="rMeses">—</div><div class="lbl">Meses</div></div>
+        <div class="r-cell"><div class="num" id="rHoras">—</div><div class="lbl">Horas aprox.</div></div>
+      </div>
+      <div class="r-note" id="rNote">—</div>
+    </div>
+  </div>
+</section>
+
+<section class="info">
+  <div class="wrap">
+    <h2>¿Cómo funciona?</h2>
+    <p>Calculamos la diferencia exacta entre hoy y la fecha que elijas, y te la mostramos en distintas unidades para que te hagas una idea real del tiempo que queda: días, semanas, meses y una estimación en horas.</p>
+    <h2>¿Para qué sirve esto?</h2>
+    <p>Ideal para cuentas atrás de bodas, viajes, exámenes, lanzamientos, mudanzas o cualquier fecha que estés esperando. Si la fecha ya pasó, te lo indicamos también, por si quieres saber cuánto tiempo hace de algo.</p>
+    <a href="index.html" class="back-link">← Volver a todas las calculadoras</a>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap" style="display:flex; justify-content:space-between; width:100%; flex-wrap:wrap; gap:10px;">
+    <span>Días Exactos — hecho para ser útil, gratis, siempre.</span>
+    <span id="year"></span>
+  </div>
+</footer>
+
+<script>
+  document.getElementById('year').textContent = new Date().getFullYear();
+
+  function calcularCuentaAtras(){
+    const nameVal = document.getElementById('eventName').value.trim();
+    const dateVal = document.getElementById('eventDate').value;
+    const errorMsg = document.getElementById('errorMsg');
+    const receipt = document.getElementById('receipt');
+
+    if(!dateVal){
+      errorMsg.classList.add('show');
+      receipt.classList.remove('show');
+      return;
+    }
+
+    const eventDate = new Date(dateVal + 'T00:00:00');
+    if(isNaN(eventDate.getTime())){
+      errorMsg.classList.add('show');
+      receipt.classList.remove('show');
+      return;
+    }
+    errorMsg.classList.remove('show');
+
+    const today = new Date();
+    today.setHours(0,0,0,0);
+
+    const msPerDay = 1000 * 60 * 60 * 24;
+    const diffDays = Math.round((eventDate - today) / msPerDay);
+
+    document.getElementById('rEvent').textContent = nameVal ? nameVal : 'Tu evento';
+
+    if(diffDays === 0){
+      document.getElementById('rDias').textContent = '0';
+      document.getElementById('rSemanas').textContent = '0';
+      document.getElementById('rMeses').textContent = '0';
+      document.getElementById('rHoras').textContent = '0';
+      document.getElementById('rNote').innerHTML = 'Es <b>hoy</b> 🎉';
+    } else if(diffDays > 0){
+      document.getElementById('rDias').textContent = diffDays.toLocaleString('es-ES');
+      document.getElementById('rSemanas').textContent = (diffDays / 7).toFixed(1);
+      document.getElementById('rMeses').textContent = (diffDays / 30.44).toFixed(1);
+      document.getElementById('rHoras').textContent = (diffDays * 24).toLocaleString('es-ES');
+      document.getElementById('rNote').innerHTML = `Faltan <b>${diffDays.toLocaleString('es-ES')} día${diffDays === 1 ? '' : 's'}</b>`;
+    } else {
+      const pastDays = Math.abs(diffDays);
+      document.getElementById('rDias').textContent = pastDays.toLocaleString('es-ES');
+      document.getElementById('rSemanas').textContent = (pastDays / 7).toFixed(1);
+      document.getElementById('rMeses').textContent = (pastDays / 30.44).toFixed(1);
+      document.getElementById('rHoras').textContent = (pastDays * 24).toLocaleString('es-ES');
+      document.getElementById('rNote').innerHTML = `Ya pasó, hace <b>${pastDays.toLocaleString('es-ES')} día${pastDays === 1 ? '' : 's'}</b>`;
+    }
+
+    receipt.classList.add('show');
+  }
+</script>
+
+</body>
+</html>
