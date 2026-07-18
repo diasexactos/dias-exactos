@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Días Exactos — Calculadoras de fechas gratuitas</title>
+<meta name="description" content="Calculadoras de fechas simples y gratuitas: edad exacta, días entre fechas, cuenta atrás para eventos. Sin registro, sin anuncios molestos.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #E9EAE3;
+    --ink: #16221F;
+    --ink-soft: #4A544F;
+    --accent: #1B6F5A;
+    --accent-soft: #DCE7E1;
+    --mustard: #D6A419;
+    --line: #B9BDB2;
+    --paper: #FBFAF6;
+    --white: #FFFFFF;
+  }
+
+  *{ box-sizing: border-box; }
+
+  body{
+    margin:0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Inter', sans-serif;
+    line-height: 1.5;
+  }
+
+  .wrap{
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  /* HEADER */
+  header{
+    border-bottom: 1px solid var(--line);
+    padding: 28px 0;
+  }
+  header .wrap{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+  }
+  .logo{
+    font-family:'JetBrains Mono', monospace;
+    font-weight: 800;
+    font-size: 1.15rem;
+    letter-spacing: -0.02em;
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  .logo .dot{ color: var(--accent); }
+  nav a{
+    color: var(--ink-soft);
+    text-decoration:none;
+    font-size: 0.9rem;
+    margin-left: 20px;
+  }
+  nav a:hover{ color: var(--accent); }
+
+  /* HERO */
+  .hero{
+    padding: 56px 0 40px;
+    border-bottom: 1px dashed var(--line);
+  }
+  .eyebrow{
+    font-family:'JetBrains Mono', monospace;
+    font-size: 0.78rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 14px;
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  .eyebrow::before{
+    content:'';
+    width: 18px;
+    height: 1px;
+    background: var(--accent);
+    display:inline-block;
+  }
+  h1{
+    font-family:'JetBrains Mono', monospace;
+    font-weight: 800;
+    font-size: clamp(2rem, 5vw, 3rem);
+    line-height: 1.08;
+    letter-spacing: -0.02em;
+    margin: 0 0 18px;
+  }
+  .hero p{
+    max-width: 55ch;
+    color: var(--ink-soft);
+    font-size: 1.05rem;
+  }
+
+  /* TOOL SECTION */
+  .tool{
+    padding: 48px 0;
+  }
+  .tool-label{
+    font-family:'JetBrains Mono', monospace;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--ink-soft);
+    margin-bottom: 6px;
+  }
+  .tool h2{
+    font-family:'JetBrains Mono', monospace;
+    font-size: 1.6rem;
+    margin: 0 0 28px;
+  }
+
+  .calc-box{
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 28px;
+    display:flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    align-items:flex-end;
+  }
+  .field{
+    display:flex;
+    flex-direction:column;
+    gap: 6px;
+  }
+  .field label{
+    font-family:'JetBrains Mono', monospace;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--ink-soft);
+  }
+  .field input{
+    font-family:'JetBrains Mono', monospace;
+    font-size: 1rem;
+    padding: 10px 12px;
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    background: var(--white);
+    color: var(--ink);
+    min-width: 180px;
+  }
+  .field input:focus{
+    outline: 2px solid var(--accent);
+    outline-offset: 1px;
+  }
+  button.calc-btn{
+    font-family:'JetBrains Mono', monospace;
+    font-weight: 700;
+    font-size: 0.9rem;
+    background: var(--accent);
+    color: var(--white);
+    border: none;
+    padding: 12px 22px;
+    border-radius: 3px;
+    cursor: pointer;
+    letter-spacing: 0.02em;
+  }
+  button.calc-btn:hover{ background: #155A49; }
+  button.calc-btn:focus-visible{
+    outline: 2px solid var(--ink);
+    outline-offset: 2px;
+  }
+
+  /* RECEIPT / SIGNATURE ELEMENT */
+  .receipt{
+    margin-top: 28px;
+    max-width: 340px;
+    background: var(--white);
+    border: 1px solid var(--line);
+    position: relative;
+    padding: 24px 22px 22px;
+    font-family:'JetBrains Mono', monospace;
+    display:none;
+  }
+  .receipt.show{ display:block; animation: rise 0.35s ease; }
+  @keyframes rise{
+    from{ opacity:0; transform: translateY(8px); }
+    to{ opacity:1; transform: translateY(0); }
+  }
+  .receipt::before,
+  .receipt::after{
+    content:'';
+    position:absolute;
+    left:0; right:0;
+    height: 10px;
+    background:
+      radial-gradient(circle at 6px 50%, transparent 5px, var(--white) 5.5px) repeat-x;
+    background-size: 12px 10px;
+  }
+  .receipt::before{ top: -5px; }
+  .receipt::after{ bottom: -5px; transform: rotate(180deg); }
+  .receipt .r-title{
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--ink-soft);
+    border-bottom: 1px dashed var(--line);
+    padding-bottom: 10px;
+    margin-bottom: 12px;
+  }
+  .receipt .r-row{
+    display:flex;
+    justify-content: space-between;
+    font-size: 0.85rem;
+    padding: 5px 0;
+    color: var(--ink-soft);
+  }
+  .receipt .r-row span:last-child{
+    color: var(--ink);
+    font-weight: 700;
+  }
+  .receipt .r-main{
+    text-align:center;
+    margin: 14px 0;
+    padding: 14px 0;
+    border-top: 1px dashed var(--line);
+    border-bottom: 1px dashed var(--line);
+  }
+  .receipt .r-main .num{
+    font-size: 2.1rem;
+    font-weight: 800;
+    color: var(--accent);
+    line-height:1;
+  }
+  .receipt .r-main .lbl{
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--ink-soft);
+    margin-top: 6px;
+  }
+  .receipt .r-next{
+    text-align:center;
+    font-size: 0.78rem;
+    color: var(--ink-soft);
+    margin-top: 4px;
+  }
+  .receipt .r-next b{ color: var(--mustard); }
+
+  .error-msg{
+    font-family:'JetBrains Mono', monospace;
+    font-size: 0.85rem;
+    color: #B0402C;
+    margin-top: 10px;
+    display:none;
+  }
+  .error-msg.show{ display:block; }
+
+  /* ROADMAP */
+  .roadmap{
+    padding: 40px 0 60px;
+    border-top: 1px dashed var(--line);
+  }
+  .roadmap h3{
+    font-family:'JetBrains Mono', monospace;
+    font-size: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--ink-soft);
+    margin-bottom: 18px;
+  }
+  .roadmap ul{
+    list-style:none;
+    margin:0; padding:0;
+    display:grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px,1fr));
+    gap: 10px;
+  }
+  .roadmap li{
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 14px 16px;
+    background: var(--accent-soft);
+    font-size: 0.88rem;
+    color: var(--ink-soft);
+  }
+  .roadmap li b{
+    color: var(--ink);
+    display:block;
+    font-family:'JetBrains Mono', monospace;
+    font-size: 0.85rem;
+    margin-bottom: 2px;
+  }
+  .roadmap li.soon{
+    background: var(--white);
+    border-style: dashed;
+  }
+  .tag{
+    display:inline-block;
+    font-family:'JetBrains Mono', monospace;
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    background: var(--mustard);
+    color: var(--ink);
+    padding: 2px 6px;
+    border-radius: 2px;
+    margin-left: 6px;
+    vertical-align: middle;
+  }
+
+  footer{
+    border-top: 1px solid var(--line);
+    padding: 24px 0 40px;
+    font-family:'JetBrains Mono', monospace;
+    font-size: 0.78rem;
+    color: var(--ink-soft);
+    display:flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  @media (max-width: 520px){
+    .calc-box{ flex-direction: column; align-items: stretch; }
+    button.calc-btn{ width: 100%; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <div class="logo">Días Exactos<span class="dot">.</span></div>
+    <nav>
+      <a href="#calculadora">Calculadora</a>
+      <a href="#proximas">Calculadoras</a>
+    </nav>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="wrap">
+    <div class="eyebrow">Herramientas gratuitas de fechas</div>
+    <h1>Cuentas exactas,<br>sin vueltas ni anuncios.</h1>
+    <p>Un conjunto de calculadoras de fechas simples y precisas: edad exacta, días entre dos fechas, cuenta atrás para eventos. Sin registro, sin dar tu email, sin letra pequeña.</p>
+  </div>
+</section>
+
+<section class="tool" id="calculadora">
+  <div class="wrap">
+    <div class="tool-label">Calculadora 01</div>
+    <h2>¿Cuántos años tienes, exactamente?</h2>
+
+    <div class="calc-box">
+      <div class="field">
+        <label for="birthdate">Tu fecha de nacimiento</label>
+        <input type="date" id="birthdate">
+      </div>
+      <button class="calc-btn" onclick="calcularEdad()">Calcular edad</button>
+    </div>
+
+    <div class="error-msg" id="errorMsg">Introduce una fecha de nacimiento válida (no puede ser en el futuro).</div>
+
+    <div class="receipt" id="receipt">
+      <div class="r-title">Días Exactos · Resultado</div>
+      <div class="r-main">
+        <div class="num" id="edadPrincipal">—</div>
+        <div class="lbl">años, meses y días exactos</div>
+      </div>
+      <div class="r-row"><span>Total de días vividos</span><span id="diasTotales">—</span></div>
+      <div class="r-row"><span>Total de meses</span><span id="mesesTotales">—</span></div>
+      <div class="r-row"><span>Día de la semana en que naciste</span><span id="diaSemana">—</span></div>
+      <div class="r-next">Próximo cumpleaños en <b id="proximoCumple">—</b></div>
+    </div>
+  </div>
+</section>
+
+<section class="roadmap" id="proximas">
+  <div class="wrap">
+    <h3>Todas las calculadoras</h3>
+    <ul>
+      <li><a href="dias-entre-fechas.html" style="text-decoration:none; color:inherit;"><b>Días entre dos fechas →</b>Calcula cuántos días, semanas o meses hay entre dos fechas cualquiera.</a></li>
+      <li><a href="cuenta-atras.html" style="text-decoration:none; color:inherit;"><b>Cuenta atrás para eventos →</b>Cuántos días faltan para tu boda, un viaje o cualquier fecha importante.</a></li>
+      <li><a href="sumar-restar-dias.html" style="text-decoration:none; color:inherit;"><b>Sumar o restar días a una fecha →</b>¿Qué día será dentro de 90 días? Resuélvelo al instante.</a></li>
+      <li><a href="husos-horarios.html" style="text-decoration:none; color:inherit;"><b>Calculadora de husos horarios →</b>Convierte una hora entre ciudades sin liarte con el cambio de horario.</a></li>
+      <li><a href="semana-del-ano.html" style="text-decoration:none; color:inherit;"><b>Semana del año (ISO) →</b>Descubre en qué número de semana cae cualquier fecha.</a></li>
+    </ul>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap" style="display:flex; justify-content:space-between; width:100%; flex-wrap:wrap; gap:10px;">
+    <span>Días Exactos — hecho para ser útil, gratis, siempre.</span>
+    <span id="year"></span>
+  </div>
+</footer>
+
+<script>
+  document.getElementById('year').textContent = new Date().getFullYear();
+
+  function calcularEdad(){
+    const input = document.getElementById('birthdate').value;
+    const errorMsg = document.getElementById('errorMsg');
+    const receipt = document.getElementById('receipt');
+
+    if(!input){
+      errorMsg.classList.add('show');
+      receipt.classList.remove('show');
+      return;
+    }
+
+    const birth = new Date(input + 'T00:00:00');
+    const today = new Date();
+    today.setHours(0,0,0,0);
+
+    if(isNaN(birth.getTime()) || birth > today){
+      errorMsg.classList.add('show');
+      receipt.classList.remove('show');
+      return;
+    }
+    errorMsg.classList.remove('show');
+
+    // Años, meses, días exactos
+    let years = today.getFullYear() - birth.getFullYear();
+    let months = today.getMonth() - birth.getMonth();
+    let days = today.getDate() - birth.getDate();
+
+    if(days < 0){
+      months--;
+      const lastMonth = new Date(today.getFullYear(), today.getMonth(), 0);
+      days += lastMonth.getDate();
+    }
+    if(months < 0){
+      years--;
+      months += 12;
+    }
+
+    // Totales
+    const msPerDay = 1000 * 60 * 60 * 24;
+    const totalDays = Math.floor((today - birth) / msPerDay);
+    const totalMonths = years * 12 + months;
+
+    const diasSemana = ['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
+    const diaSemanaNacimiento = diasSemana[birth.getDay()];
+
+    // Próximo cumpleaños
+    let nextBirthday = new Date(today.getFullYear(), birth.getMonth(), birth.getDate());
+    if(nextBirthday < today){
+      nextBirthday = new Date(today.getFullYear() + 1, birth.getMonth(), birth.getDate());
+    }
+    const daysToNext = Math.round((nextBirthday - today) / msPerDay);
+    const nextBirthdayText = daysToNext === 0 ? '¡hoy! 🎉' : (daysToNext + ' día' + (daysToNext === 1 ? '' : 's'));
+
+    document.getElementById('edadPrincipal').textContent = `${years}a ${months}m ${days}d`;
+    document.getElementById('diasTotales').textContent = totalDays.toLocaleString('es-ES');
+    document.getElementById('mesesTotales').textContent = totalMonths.toLocaleString('es-ES');
+    document.getElementById('diaSemana').textContent = diaSemanaNacimiento.charAt(0).toUpperCase() + diaSemanaNacimiento.slice(1);
+    document.getElementById('proximoCumple').textContent = nextBirthdayText;
+
+    receipt.classList.add('show');
+  }
+</script>
+
+</body>
+</html>
